@@ -1,0 +1,24 @@
+{
+  "name": "aiciv",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sahat/hackathon-starter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sahat/hackathon-starter/issues"
+  },
+  "homepage": "https://github.com/sahat/hackathon-starter#readme",
+  "description": "",
+  "dependencies": {
+    "nodemon": "^2.0.7"
+  }
+}

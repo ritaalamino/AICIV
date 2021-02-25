@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LDR - Loader - LoadDecrunchRun by DrSnuggles</title>
+  <script src="ldr.js"></script>
+  <style>
+    * {
+      background-color: transparent;
+    }
+    textarea {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<p>LDR a branch of Decruncher</p>
+<p></p>
+
+<select id="packer">
+  <option value="jszip">JSZip (archive) (default)</option>
+  <option value="zipjs">ZipJS (archive)</option>
+  <option value="lh4">LH4 (raw)</option>
+  <option value="jsx">JSXCompressor (raw)</option>
+  <option value="pako">Pako (raw)</option>
+</select>
+
+<select id="background">
+  <option value="true">Background (default)</option>
+  <option value="false">Foreground</option>
+</select>
+
+<select id="fullscreen">
+  <option value="true">Fullscreen (default)</option>
+  <option value="false">Border only</option>
+</select>
+
+Lines (<span id="linesSet">256</span>): <input id="lines" type="range" min="1" max="1024" value="256" step="1" onchange="linesSet.innerText=this.value;"/>
+
+<br/>
+
+<button onclick="demoDepack1();">Unpack 1 changes default values</button>
+<button onclick="demoDepack2();">Unpack 2 function call with arguments</button>
+<button onclick="demoDepack3();">Unpack 3 minimal</button>
+<button onclick="demoDepack4();">Unpack 4 just unpack</button>
+
+<p>The ones for archive use modlands 4.52MB zip file.</p>
+<p>ZipJS works with an worker. Best speed but only if you want to host the packer. Not that easy with CDNs.</p>
+<p>JSZip Little bit slower but only one file. Easy with CDNs.</p>
+<p>NOT YET SUPPORTED : LH4, JSXCompressor and Pako are raw decompressors without capability of multiple files in one archive.</p>
+
+<textarea id="output" rows="20"></textarea>
+
+<script>
+  function demoDepack1() {
+    // this function sets the options as new default, nice if you have more than one file to decrunch
+    LDR.packer = packer.value;
+    LDR.background = background.value === "true";
+    LDR.fullscreen = fullscreen.value === "true";
+    LDR.lines = lines.value;
+    LDR.depackURL("//modland.com/allmods.zip", letsContinue);
+  }
+
+  function demoDepack2() {
+    // do not change default settings but use given arguments
+    LDR.depackURL("//modland.com/allmods.zip", letsContinue, packer.value, (background.value==="true"), (fullscreen.value==="true"), lines.value);
+  }
+
+  function demoDepack3() {
+    // minimal
+    LDR.depackURL("//modland.com/allmods.zip", letsContinue);
+  }
+
+  function demoDepack4() {
+    // just unpack
+    LDR.visualOutput = false;
+    LDR.depackURL("//modland.com/allmods.zip", letsContinue);
+  }
+
+  function letsContinue(data) {
+    output.value = data.substr(0, 1000) +"...";
+    LDR.visualOutput = true; // set it back to default just coz of demoDepack4
+  }
+</script>
+
+</body>
+</html>

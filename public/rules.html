@@ -89,6 +89,11 @@ var canvas = document.getElementById("myCanvas2");
 		}
 		iconSize += iconRotate;
 	}
+
+	var a = document.createElement('a');
+	a.href = "index.html";
+	document.body.appendChild(a);
+
 	function draw(){
 		context.drawImage(bgImage, 0, backgroundY);
 		context.drawImage(logoImage, 50,-200);

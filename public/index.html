@@ -22,15 +22,16 @@
 	var instructImage = new Image();
 	var settingsImage = new Image();
 	var creditsImage = new Image();
+	var teamImage = new Image();
 	var iconImage = new Image();
 
 	var backgroundY = 0;
 	var speed = 1;
 	
-	var buttonX = [192,110,149,160];
-	var buttonY = [100,140,180,220];
-	var buttonWidth = [96,260,182,160];
-	var buttonHeight = [40,40,40,40];
+	var buttonX = [150,150,150,150];
+	var buttonY = [100,150,200,250];
+	var buttonWidth = [200,200,200,200];
+	var buttonHeight = [50,50,50,50];
 	
 	var iconX = [0,0];
 	var iconY = [0,0];
@@ -52,9 +53,9 @@
 	};
 	bgImage.src = "img/Background.png";
 	logoImage.onload = function(){
-		context.drawImage(logoImage, 50, -10);
+		context.drawImage(logoImage);
 	}
-	logoImage.src = "img/logo.png";
+	logoImage.src = "img/logo2.svg";
 	playImage.onload = function(){
 		context.drawImage(playImage, buttonX[0], buttonY[0]);
 	}
@@ -67,10 +68,15 @@
 		context.drawImage(settingsImage, buttonX[2], buttonY[2]);
 	}
 	settingsImage.src = "img/settings.png";
+	teamImage.onload = function(){
+		context.drawImage(teamImage);
+	}
+	teamImage.src = "img/logotime.svg";
 	creditsImage.onload = function(){
 		context.drawImage(creditsImage, buttonX[3], buttonY[3]);
 	}
 	creditsImage.src = "img/credits.png";
+
 	
 	timerId = setInterval("update()", 1000/frames);
 	
@@ -101,11 +107,12 @@
 	}
 	function draw(){
 		context.drawImage(bgImage, 0, backgroundY);
-		context.drawImage(logoImage, 50,-10);
+		context.drawImage(logoImage, 50,-200);
 		context.drawImage(playImage, buttonX[0], buttonY[0]);
 		context.drawImage(instructImage, buttonX[1], buttonY[1]);
 		context.drawImage(settingsImage, buttonX[2], buttonY[2]);
 		context.drawImage(creditsImage, buttonX[3], buttonY[3]);
+		context.drawImage(teamImage, 10, 240, 100, 100);
 		if(iconVisible == true){
 			context.drawImage(iconImage, iconX[0] - (iconSize/2), iconY[0], iconSize, iconHeight);
 			context.drawImage(iconImage, iconX[1] - (iconSize/2), iconY[1], iconSize, iconHeight);

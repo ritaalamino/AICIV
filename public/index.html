@@ -4,8 +4,13 @@
 <title>Pegação</title>
 </head>
 
+<script type="text/javascript" src="js/PxLoader.js"></script>
+<script type="text/javascript" src="js/PxLoaderImage.js"></script> 
+
+
 <body>
 <canvas id="myCanvas" width="480" height="320"><p>Your browser does not support HTML5!</p></canvas> 
+
 <script type="text/javascript">
 	var canvas = document.getElementById("myCanvas");
 	var context = canvas.getContext("2d");
@@ -16,6 +21,17 @@
 	var mouseX;
 	var mouseY;
 	
+	var loader = new PxLoader();
+
+	var bgImage = loader.addImage('img/Background.png');
+	var logoImage =	loader.addImage('img/logo2.svg');
+	var playImage =	loader.addImage('img/play.png');
+	var instructImage =	loader.addImage('img/instructions.png');
+	var settingsImage =	loader.addImage('img/settings.png');
+	var creditsImage =	loader.addImage('img/credits.png');
+	var teamImage =	loader.addImage('img/logotime.svg');
+	var iconImage =	loader.addImage('img/ship.png');
+/*
 	var bgImage = new Image();
 	var logoImage = new Image();
 	var playImage = new Image();
@@ -24,7 +40,7 @@
 	var creditsImage = new Image();
 	var teamImage = new Image();
 	var iconImage = new Image();
-
+*/
 	var backgroundY = 0;
 	var speed = 1;
 	
@@ -46,7 +62,7 @@
     var timerId = 0;
 	var fadeId = 0;
 	var time = 0.0;
-
+/*
 	iconImage.src = "img/ship.png";
 	bgImage.onload = function(){
 		context.drawImage(bgImage, 0, backgroundY);
@@ -76,7 +92,7 @@
 		context.drawImage(creditsImage, buttonX[3], buttonY[3]);
 	}
 	creditsImage.src = "img/credits.png";
-
+*/
 	
 	timerId = setInterval("update()", 1000/frames);
 	
@@ -164,6 +180,16 @@
 			canvas.addEventListener("mouseup", checkClick);
 		}
 	}
+
+	loader.addProgressListener(function(e) { 
+    	console.log(e.resource.getName()); 
+	}); 
+
+	loader.addCompletionListener(function(e) { 
+    	console.log('Ready to go!'); 
+	}); 
+
+	loader.start();	
 </script> 
 </body>
 

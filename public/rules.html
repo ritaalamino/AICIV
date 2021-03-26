@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pegação</title>
+</head>
+
+<body>
+<canvas id="myCanvas2" width="480" height="320"><p>Your browser does not support HTML5!</p></canvas> 
+<script type="text/javascript">
+var canvas = document.getElementById("myCanvas2");
+	var context = canvas.getContext("2d");
+	
+	var width = canvas.getAttribute('width');
+	var height = canvas.getAttribute('height');
+	
+	var mouseX;
+	var mouseY;
+	
+	var bgImage = new Image();
+	var logoImage = new Image();
+	var creditosText = new Image();
+    var voltarText = new Image();
+	var iconImage = new Image();
+
+	var backgroundY = 0;
+	var speed = 1;
+	
+	var buttonX = [350];
+	var buttonY = [250];
+	var buttonWidth = [96,260,182,160];
+	var buttonHeight = [40,40,40,40];
+	
+	var iconX = [0,0];
+	var iconY = [0,0];
+	var iconWidth = 35;
+	var iconHeight = 40;
+	
+	var iconVisible = false;
+	var iconSize = iconWidth;
+	var iconRotate = 0;
+	
+	var frames = 30;
+    var timerId = 0;
+	var fadeId = 0;
+	var time = 0.0;
+
+	iconImage.src = "img/ship.png";
+	bgImage.onload = function(){
+		context.drawImage(bgImage, 0, backgroundY);
+	};
+	bgImage.src = "img/Background.png";
+	logoImage.onload = function(){
+		context.drawImage(logoImage, 50, -10);
+	}
+	logoImage.src = "img/logo.png";
+	creditosText.onload = function(){
+		context.drawImage(creditosText, 80, 80);
+	}
+	creditosText.src = "img/creditos_texto.png";
+
+    voltarText.onload = function(){
+        context.drawImage(voltarText, buttonX[0], buttonY[0]);
+    }
+    voltarText.src = "img/voltar.png";
+	
+	timerId = setInterval("update()", 1000/frames);
+	
+	canvas.addEventListener("mousemove", checkPos);
+	canvas.addEventListener("mouseup", checkClick);
+	
+	function update() {
+		clear();
+		move();
+		draw();
+	}
+	function clear() {
+		context.clearRect(0, 0, width, height);
+	}
+	function move(){
+		backgroundY -= speed;
+		if(backgroundY == -1 * height){
+			backgroundY = 0;
+		}
+		if(iconSize == iconWidth){
+			iconRotate = -1;
+		}
+		if(iconSize == 0){
+			iconRotate = 1;
+		}
+		iconSize += iconRotate;
+	}
+
+	var a = document.createElement('a');
+	a.href = "index.html";
+	document.body.appendChild(a);
+
+	function draw(){
+		context.drawImage(bgImage, 0, backgroundY);
+		context.drawImage(logoImage, 50,-200);
+		context.drawImage(creditosText, 80, 80);
+		context.drawImage(voltarText, buttonX[0], buttonY[0]);
+	}
+	function checkPos(mouseEvent){
+		if(mouseEvent.pageX || mouseEvent.pageY == 0){
+			mouseX = mouseEvent.pageX - this.offsetLeft;
+			mouseY = mouseEvent.pageY - this.offsetTop;
+		}else if(mouseEvent.offsetX || mouseEvent.offsetY == 0){
+			mouseX = mouseEvent.offsetX;
+			mouseY = mouseEvent.offsetY;
+		}
+		for(i = 0; i < buttonX.length; i++){
+			if(mouseX > buttonX[i] && mouseX < buttonX[i] + buttonWidth[i]){
+				if(mouseY > buttonY[i] && mouseY < buttonY[i] + buttonHeight[i]){
+					iconVisible = true;
+					iconX[0] = buttonX[i] - (iconWidth/2) - 2;
+					iconY[0] = buttonY[i] + 2;
+					iconX[1] = buttonX[i] + buttonWidth[i] + (iconWidth/2); 
+					iconY[1] = buttonY[i] + 2;
+				}
+			}else{
+				iconVisible = false;
+			}
+		}
+	}
+	function checkClick(mouseEvent){
+		for(i = 0; i < buttonX.length; i++){
+			if(mouseX > buttonX[i] && mouseX < buttonX[i] + buttonWidth[i]){
+				if(mouseY > buttonY[i] && mouseY < buttonY[i] + buttonHeight[i]){
+					fadeId = setInterval("fadeOut()", 1000/frames);
+					clearInterval(timerId);
+					canvas.removeEventListener("mousemove", checkPos);
+					canvas.removeEventListener("mouseup", checkClick);
+				}
+			}
+		}
+	}
+	function fadeOut(){
+		context.fillStyle = "rgba(0,0,0, 0.2)";
+		context.fillRect (0, 0, width, height);
+		time += 0.1;
+		if(time >= 2){
+			clearInterval(fadeId);
+			time = 0;
+			timerId = setInterval("update()", 1000/frames);
+			canvas.addEventListener("mousemove", checkPos);
+			canvas.addEventListener("mouseup", checkClick);
+		}
+	}
+</script> 
+</body>
+
+</html> 

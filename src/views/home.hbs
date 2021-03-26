@@ -1,15 +1,34 @@
+<script src="/views/home/config.js"></script>
 <script>
-
+	// variables
+	const bgContainer = new PIXI.Container();
+	const menuContainer = new PIXI.Container();
 	const mainContainer = new PIXI.Container();
-	const optionContainer = new PIXI.Container();
-	app.stage.addChild(container);
 
-	const starTexture = PIXI.Texture.from('/sprites/star.png');
+	mainContainer.addChild(bgContainer);
+	mainContainer.addChild(menuContainer);
+	app.stage.addChild(mainContainer);
 
+	// switch containers
+	let enableToEnterInContainer = true;
+	let inSwitchContainers = false;
+	let switchTime = 0;
+	let switchContainers = [];
+	let activeContainer = menuContainer;
+	let oldActiveContainer = menuContainer;
+	const switchMaxBlur = 20;
+	const enterContainerAnimationTime = 750;
+	const blurOutFilter = new PIXI.filters.BlurFilter();
+	const blurInFilter = new PIXI.filters.BlurFilter();
+
+	const containers = {
+		config: new ConfigView(mainContainer),
+	};
+
+	// Bg-animation
 	let cameraZ = 0;
 	let speed = 0;
 	let warpSpeed = 0;
-
 	const animationProps = {
 		fov: 20,
 		amount: 1000,
@@ -17,6 +36,19 @@
 		baseSize: 0.05,
 		baseSpeed: 0.25,
 	};
+
+	// buttons
+	let yButtons = app.screen.height * 0.40;
+	let gap = 10;
+	let stride = 50;
+
+
+
+	// end-variables
+
+
+	const starTexture = PIXI.Texture.from('/sprites/star.png');
+
 
 	const stars = [];
 	for (let i = 0; i < animationProps.amount; i++) {
@@ -29,7 +61,7 @@
 		star.sprite.anchor.x = 0.5;
 		star.sprite.anchor.y = 0.7;
 		randomizeStar(star, true);
-		mainContainer.addChild(star.sprite);
+		bgContainer.addChild(star.sprite);
 		stars.push(star);
 	}
 
@@ -48,26 +80,27 @@
 	const logo = PIXI.Sprite.from('/img/logo.png');
 	logo.anchor.set(0.5);
 	logo.x = app.screen.width * 0.54;
-	logo.y = app.screen.height * 0.10;
-	mainContainer.addChild(logo);
+	logo.y = app.screen.height * 0.15;
+	menuContainer.addChild(logo);
 
 
 	const logoTime = PIXI.Sprite.from('/img/logotime.svg');
 	logoTime.anchor.set(0.5);
-	logoTime.x = app.screen.width * 0.15;
+	logoTime.x = app.screen.width * 0.18;
 	logoTime.y = app.screen.height * 0.88;
-	mainContainer.addChild(logoTime);
+	menuContainer.addChild(logoTime);
 
-	// Botões
-	let yButtons = app.screen.height * 0.40;
-	let gap = 10;
-	let stride = 50;
 
 	const buttonsProps = [
-		{ src: '/img/play.png', onClick: () => alert('fodac') },
+		{
+			src: '/img/play.png', onClick: () => {
+				enableWarpedSpeed();
+
+			}
+		},
 		{ src: '/img/instructions.png', onClick: () => alert('asdasdasd') },
 		{ src: '/img/credits.png', onClick: () => alert('asdasdasd') },
-		{ src: '/img/settings.png', onClick: () => alert('asdasdasd') }
+		{ src: '/img/settings.png', onClick: () => openContainer(containers.config) }
 	];
 
 	for (i = 0; i < buttonsProps.length; i++) {
@@ -77,23 +110,30 @@
 			app.screen.width / 2,
 			yButtons + gap * i + stride * i,
 			0.5,
-			button.onClick
+			button.onClick,
+			true,
+			true
 		);
-		mainContainer.addChild(temp_button.sprite);
+		menuContainer.addChild(temp_button.sprite);
 	}
 
-	const bgAudio = new sound('/sounds/bg-home2.mp3', true);
+	const bgmAudio = new sound('/sounds/bg-home2.mp3', true);
+	bgmAudio.setVolume(store.get('game@bgm', 50));
+
+	store.observe('game@bgm', (val) => {
+		bgmAudio.setVolume(val);
+	})
 	let bgStarted = false;
-	document.body.addEventListener("mousemove", function () {
+	document.body.addEventListener("click", function () {
 		try {
-			bgAudio.play()
+			bgmAudio.play()
 		} catch {
 		}
 	});
 
 
 
-
+	// animation bg
 	app.ticker.add((delta) => {
 		// Simple easing. This should be changed to proper easing function when used for real.
 		speed += (warpSpeed - speed) / 20;
@@ -120,8 +160,118 @@
 		}
 	});
 
+	// animation fadein/out container
+	// precisa ser melhorado, os efeitos de fade in/out ainda não estão legais.
+	app.ticker.add((delta) => {
+		if (inSwitchContainers) {
+			switchTime = (switchTime + app.ticker.elapsedMS) < enterContainerAnimationTime
+				? (switchTime + app.ticker.elapsedMS) : enterContainerAnimationTime;
+			let progress = switchTime / enterContainerAnimationTime;
+			// preciso estudar melhor essa animação
+			blurInFilter.blur = 0;
+			blurOutFilter.blur = 0;
+			//blurOutFilter.blur = (progress <= .5 ? progress * 2 : 1) * switchMaxBlur;
+			//blurInFilter.blur = (progress >= .5 ? 2 - progress * 2 : 0) * switchMaxBlur;
+			const [current, target] = switchContainers;
+			current_alpha = (progress <= .5 ? 1 - progress * 2 : 0);
+			target_alpha = (progress <= .5 ? progress * 2 : 1);
+			if (target.container) {
+				target.container.alpha = target_alpha;
+			} else {
+				target.alpha = target_alpha;
+			}
+			if (current.container) {
+				current.container.alpha = current_alpha;
+			} else {
+				current.alpha = current_alpha;
+			}
+		}
+	});
 
 
 
+
+	// Helpers zone
+
+	function enableWarpedSpeed() {
+		warpSpeed = 1;
+		const t = setTimeout(() => {
+			disableWarpedSpeed();
+		}, enterContainerAnimationTime);
+		return t;
+	}
+
+
+	function disableWarpedSpeed() {
+		warpSpeed = 0;
+	}
+
+	function enableFiltersSwitchContainers() {
+		let [current, target] = switchContainers;
+
+		current = current.container || current;
+		target = target.container || current;
+
+		current.children = current.children.map(el => {
+			el.filters = [blurOutFilter];
+			return el;
+		});
+
+		target.children = target.children.map(el => {
+			el.filters = [blurInFilter];
+			return el;
+		});
+	}
+	function disableFiltersSwitchContainers() {
+		let [current, target] = switchContainers;
+		current = current.container || current;
+		target = target.container || current;
+
+		current.children = current.children.map(el => {
+			el.filters = [];
+			return el;
+		});
+		target.children = target.children.map(el => {
+			el.filters = [];
+			return el;
+		});
+	}
+
+
+	// precisa ser melhorado, os efeitos de fade in/out ainda não estão legais.
+	function openContainer(panel) {
+		if (enableToEnterInContainer) {
+			enableToEnterInContainer = false;
+			inSwitchContainers = true;
+			if (panel.draw) {
+				panel.container.alpha = 0;
+				panel.draw();
+			} else {
+				panel.alpha = 0;
+				mainContainer.addChild(panel);
+			}
+			if (oldActiveContainer.draw) {
+				oldActiveContainer.container.alpha = 1;
+			} else {
+				oldActiveContainer.alpha = 1;
+			}
+			oldActiveContainer = activeContainer;
+			activeContainer = panel;
+			switchContainers = [oldActiveContainer, panel];
+			enableFiltersSwitchContainers();
+			enableWarpedSpeed();
+			const t = setTimeout(() => {
+				if (oldActiveContainer) {
+					((oldActiveContainer.container || oldActiveContainer).parent || mainContainer)
+						.removeChild(oldActiveContainer.container || oldActiveContainer);
+				}
+				enableToEnterInContainer = true;
+				inSwitchContainers = false;
+				switchTime = 0;
+				disableFiltersSwitchContainers();
+				switchContainers = [];
+			}, enterContainerAnimationTime);
+		}
+	}
 
 </script>

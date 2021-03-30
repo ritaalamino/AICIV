@@ -1,4 +1,5 @@
 <script src="/views/home/config.js"></script>
+<script src="/views/home/instructions.js"></script>
 <script>
 	// variables
 	const bgContainer = new PIXI.Container();
@@ -23,6 +24,7 @@
 
 	const containers = {
 		config: new ConfigView(mainContainer),
+		instructions: new InstructionsView(mainContainer),
 	};
 
 	// Bg-animation
@@ -83,8 +85,8 @@
 	logo.y = app.screen.height * 0.15;
 	menuContainer.addChild(logo);
 
-
 	const logoTime = PIXI.Sprite.from('/img/logotime.svg');
+	const logoTimePerspective = logo.width / logo.height;
 	logoTime.anchor.set(0.5);
 	logoTime.x = app.screen.width * 0.18;
 	logoTime.y = app.screen.height * 0.88;
@@ -98,7 +100,7 @@
 
 			}
 		},
-		{ src: '/img/instructions.png', onClick: () => alert('asdasdasd') },
+		{ src: '/img/instructions.png', onClick: () => openContainer(containers.instructions) },
 		{ src: '/img/credits.png', onClick: () => alert('asdasdasd') },
 		{ src: '/img/settings.png', onClick: () => openContainer(containers.config) }
 	];

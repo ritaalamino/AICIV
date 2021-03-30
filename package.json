@@ -19,6 +19,8 @@
   "homepage": "https://github.com/sahat/hackathon-starter#readme",
   "description": "",
   "dependencies": {
-    "nodemon": "^2.0.7"
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7",
+    "phaser": "^3.53.1"
   }
 }

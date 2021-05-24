@@ -28,8 +28,8 @@ export class Game {
 	private options: GameProps
 	private players: Player[] = []
 	private matchs: Match[] = []
-	private matchsObservers: CallableFunction[]
-	private playersObservers: CallableFunction[]
+	// private matchsObservers: CallableFunction[]
+	// private playersObservers: CallableFunction[]
 	private matchsMutex: Mutex
 	private playersMutex: Mutex
 
@@ -427,7 +427,7 @@ export class Game {
 		if (!host) throw Error("Host não encontrado.")
 		if (!match) throw Error("Pardida invalida.")
 
-		const randIndex = Math.floor(Math.random() * (match.numPlayers))
+		const randIndex = Math.floor(Math.random() * (match.numPlayers - 1))
 
 		const catcherIsHost = randIndex === 0;
 		const release = await this.matchsMutex.acquire()
